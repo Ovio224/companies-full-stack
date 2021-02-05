@@ -27,7 +27,3 @@ To start the client, run the following commands
 cd client
 npm start
 ```
-
-### Author
-
-👤 **Ovi**
