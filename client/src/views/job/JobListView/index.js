@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Container, makeStyles } from '@material-ui/core';
 import Page from 'src/components/Page';
-import axios from 'axios';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Results from './Results';
-import { API_URL } from '../../../utils/constants';
+import { useStore } from '../../../store';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -14,16 +14,10 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CustomerListView = () => {
+const JobListView = () => {
   const classes = useStyles();
-  const [jobs, setJobs] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get(`${API_URL}/jobs`)
-      .then((resolvedPromise) => setJobs(resolvedPromise?.data))
-      .catch(console.error);
-  }, []);
+  const { state } = useStore();
+  const { jobs } = state;
 
   return (
     <Page className={classes.root} title="Jobs">
@@ -36,4 +30,4 @@ const CustomerListView = () => {
   );
 };
 
-export default CustomerListView;
+export default withAuthenticationRequired(JobListView);

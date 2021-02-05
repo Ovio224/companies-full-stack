@@ -12,7 +12,6 @@ const create = (req, res) => {
 
 const findAll = (req, res) => {
     Proposal.findAll().then(proposals => {
-        console.log(proposals)
         res.send(proposals);
     }).catch(err => {
         res.status(500).send("Error -> " + err);

@@ -18,6 +18,8 @@ import moment from 'moment';
 import axios from 'axios';
 import { Alert } from '@material-ui/lab';
 import { API_URL } from '../../../utils/constants';
+import { fetchAndSetData } from '../../../utils/utils';
+import { setProposals } from '../../../store/reducer/actions';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,26 +35,22 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const ProductCard = ({ className, proposal, ...rest }) => {
+const ProductCard = ({
+  className, proposal, dispatch, ...rest
+}) => {
   const classes = useStyles();
   const [showToast, setShowToast] = useState(false);
 
-  const handleAcceptProposal = () => {
+  const handleChangeProposalStatus = (status) => {
     axios
       .put(`${API_URL}/proposal/${proposal.id}`, {
         ...proposal,
-        status: 'accepted'
+        status
       })
-      .then(() => setShowToast(true));
-  };
-
-  const handleRejectProposal = () => {
-    axios
-      .put(`${API_URL}/proposal/${proposal.id}`, {
-        ...proposal,
-        status: 'rejected'
-      })
-      .then(() => setShowToast(true));
+      .then(() => {
+        fetchAndSetData(`${API_URL}/proposals`, (resolvedPromise) => setProposals(dispatch, resolvedPromise.data));
+        setShowToast(true);
+      });
   };
 
   return (
@@ -76,6 +74,11 @@ const ProductCard = ({ className, proposal, ...rest }) => {
             {proposal.description}
           </Typography>
           <Typography align="center" color="textPrimary" variant="subtitle1">
+            ID:
+            {' '}
+            {proposal.id}
+          </Typography>
+          <Typography align="center" color="textPrimary" variant="subtitle1">
             {proposal.status}
           </Typography>
         </CardContent>
@@ -88,7 +91,7 @@ const ProductCard = ({ className, proposal, ...rest }) => {
                 color="primary"
                 display="inline"
                 variant="outlined"
-                onClick={handleAcceptProposal}
+                onClick={() => handleChangeProposalStatus('accepted')}
               >
                 ACCEPT
               </Button>
@@ -98,7 +101,7 @@ const ProductCard = ({ className, proposal, ...rest }) => {
                 color="default"
                 display="inline"
                 variant="outlined"
-                onClick={handleRejectProposal}
+                onClick={() => handleChangeProposalStatus('rejected')}
               >
                 REJECT
               </Button>
@@ -123,7 +126,8 @@ const ProductCard = ({ className, proposal, ...rest }) => {
 
 ProductCard.propTypes = {
   className: PropTypes.string,
-  proposal: PropTypes.object.isRequired
+  proposal: PropTypes.object.isRequired,
+  dispatch: PropTypes.any
 };
 
 export default ProductCard;

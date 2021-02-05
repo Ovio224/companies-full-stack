@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
@@ -9,12 +9,15 @@ import {
   CardHeader,
   Divider,
   Grid,
-  makeStyles, Snackbar,
+  makeStyles,
+  Snackbar,
   TextField
 } from '@material-ui/core';
 import axios from 'axios';
 import { Alert } from '@material-ui/lab';
 import { API_URL } from '../../../utils/constants';
+import { useStore } from '../../../store';
+import { setCompany } from '../../../store/reducer/actions';
 
 const useStyles = makeStyles(() => ({
   root: {}
@@ -23,6 +26,8 @@ const useStyles = makeStyles(() => ({
 const ProfileDetails = ({ className, ...rest }) => {
   const classes = useStyles();
   const [showToast, setShowToast] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const { state, dispatch } = useStore();
   const [values, setValues] = useState({
     id: '',
     name: '',
@@ -30,11 +35,22 @@ const ProfileDetails = ({ className, ...rest }) => {
   });
 
   useEffect(() => {
+    if (state.company.id) {
+      setValues((prevState) => ({
+        ...prevState,
+        id: state.company.id,
+        name: state.company.name,
+        logo_image_uri: state.company.logo_image_uri
+      }));
+    }
+  }, [state.company]);
+
+  const handleFetchCompany = useCallback(() => {
     axios
-      .get(`${API_URL}/company/1`)
-      .then((resolvedPromise) => setValues(resolvedPromise.data))
+      .get(`${API_URL}/company/user/${state.user?.id}`)
+      .then((resolvedPromise) => setCompany(dispatch, resolvedPromise.data))
       .catch(console.error);
-  }, []);
+  }, [state.user.id]);
 
   const handleChange = (event) => {
     setValues({
@@ -45,8 +61,11 @@ const ProfileDetails = ({ className, ...rest }) => {
 
   const handleSaveCompanyData = () => {
     axios
-      .put(`${API_URL}/company/${values.id}`, { ...values })
-      .then(() => setShowToast(true))
+      .put(`${API_URL}/company/${state.company.id}`, { ...values })
+      .then(() => {
+        setShowToast(true);
+        handleFetchCompany();
+      })
       .catch(console.error);
   };
 
@@ -101,14 +120,17 @@ const ProfileDetails = ({ className, ...rest }) => {
           </Button>
         </Box>
       </Card>
-      {showToast
-        && (
-        <Snackbar open={showToast} autoHideDuration={6000} onClose={() => setShowToast(false)}>
+      {showToast && (
+        <Snackbar
+          open={showToast}
+          autoHideDuration={6000}
+          onClose={() => setShowToast(false)}
+        >
           <Alert onClose={() => setShowToast(false)} severity="success">
             The company data has been saved!
           </Alert>
         </Snackbar>
-        )}
+      )}
     </form>
   );
 };

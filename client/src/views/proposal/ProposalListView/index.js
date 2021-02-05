@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Box, Container, Grid, makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
-import axios from 'axios';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 import ProductCard from './ProductCard';
-import { API_URL } from '../../../utils/constants';
+import { useStore } from '../../../store';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,13 +21,8 @@ const useStyles = makeStyles((theme) => ({
 
 const ProposalList = () => {
   const classes = useStyles();
-  const [proposals, setProposals] = useState([]);
-
-  useEffect(() => {
-    axios.get(`${API_URL}/proposals`)
-      .then((resolvedPromise) => setProposals(resolvedPromise?.data))
-      .catch(console.error);
-  }, []);
+  const { state, dispatch } = useStore();
+  const { proposals } = state;
 
   return (
     <Page
@@ -49,6 +44,7 @@ const ProposalList = () => {
                 xs={12}
               >
                 <ProductCard
+                  dispatch={dispatch}
                   className={classes.productCard}
                   proposal={proposal}
                 />
@@ -66,4 +62,4 @@ const ProposalList = () => {
   );
 };
 
-export default ProposalList;
+export default withAuthenticationRequired(ProposalList);

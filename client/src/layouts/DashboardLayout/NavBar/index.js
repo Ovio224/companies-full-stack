@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -17,9 +17,8 @@ import {
   User as UserIcon,
   Users as UsersIcon
 } from 'react-feather';
-import axios from 'axios';
 import NavItem from './NavItem';
-import { API_URL, LOGGED_IN_COMPANY_ID } from '../../../utils/constants';
+import { useStore } from '../../../store';
 
 const items = [
   {
@@ -61,7 +60,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 const NavBar = ({ onMobileClose, openMobile }) => {
-  const [company, setCompany] = useState();
+  const { state } = useStore();
+  const { company } = state;
   const classes = useStyles();
   const location = useLocation();
 
@@ -70,13 +70,6 @@ const NavBar = ({ onMobileClose, openMobile }) => {
       onMobileClose();
     }
   }, [location.pathname]);
-
-  useEffect(() => {
-    axios
-      .get(`${API_URL}/company/${LOGGED_IN_COMPANY_ID}`)
-      .then((resolvedPromise) => setCompany(resolvedPromise.data))
-      .catch(console.error);
-  }, []);
 
   const content = (
     <Box height="100%" display="flex" flexDirection="column">
@@ -91,7 +84,7 @@ const NavBar = ({ onMobileClose, openMobile }) => {
           {company?.name}
         </Typography>
         <Typography color="textSecondary" variant="body2">
-          Because why not
+          Because we can
         </Typography>
       </Box>
       <Divider />

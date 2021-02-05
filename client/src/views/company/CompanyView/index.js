@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Grid, makeStyles } from '@material-ui/core';
 import Page from 'src/components/Page';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 import CompanyDetails from './ProfileDetails';
 
 const useStyles = makeStyles((theme) => ({
@@ -39,4 +40,4 @@ const Company = () => {
   );
 };
 
-export default Company;
+export default withAuthenticationRequired(Company);

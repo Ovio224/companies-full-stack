@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Grid, makeStyles } from '@material-ui/core';
 import Page from 'src/components/Page';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Jobs from './Jobs';
 import TotalProposals from './TotalProposals';
 
@@ -32,4 +33,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default withAuthenticationRequired(Dashboard);

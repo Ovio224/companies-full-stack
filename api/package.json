@@ -1,0 +1,28 @@
+{
+  "name": "wiredelta-challenge",
+  "version": "1.0.0",
+  "description": "wiredelta full stack challenge",
+  "main": "server.js",
+  "scripts": {
+    "server": "node server.js",
+    "seed": "npx sequelize-cli db:seed:all",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "express-jwt": "^6.0.0",
+    "express-jwt-authz": "^2.4.1",
+    "faker": "^5.3.1",
+    "jwks-rsa": "^1.12.2",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^4.44.4"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.2.0"
+  }
+}

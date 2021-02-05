@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
   AppBar,
-  Badge,
   Box,
+  Button,
   Hidden,
   IconButton,
-  Toolbar,
-  makeStyles
+  makeStyles,
+  Toolbar
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
-import InputIcon from '@material-ui/icons/Input';
 import Logo from 'src/components/Logo';
+import { useAuth0 } from '@auth0/auth0-react';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -24,44 +24,42 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const TopBar = ({
-  className,
-  onMobileNavOpen,
-  ...rest
-}) => {
+const TopBar = ({ className, onMobileNavOpen, ...rest }) => {
   const classes = useStyles();
-  const [notifications] = useState([]);
+  const { logout, isAuthenticated, loginWithRedirect } = useAuth0();
 
   return (
-    <AppBar
-      className={clsx(classes.root, className)}
-      elevation={0}
-      {...rest}
-    >
+    <AppBar className={clsx(classes.root, className)} elevation={0} {...rest}>
       <Toolbar>
         <RouterLink to="/">
           <Logo />
         </RouterLink>
         <Box flexGrow={1} />
         <Hidden mdDown>
-          <IconButton color="inherit">
-            <Badge
-              badgeContent={notifications.length}
-              color="primary"
-              variant="dot"
+          {!isAuthenticated ? (
+            <Button
+              onClick={() => loginWithRedirect({
+                redirectUri: 'http://localhost:3000/app/dashboard'
+              })}
+              startIcon={<VpnKeyIcon />}
+              variant="contained"
+              color="secondary"
             >
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton color="inherit">
-            <InputIcon />
-          </IconButton>
+              Login
+            </Button>
+          ) : (
+            <Button
+              onClick={() => logout({ returnTo: 'http://localhost:3000/app/dashboard' })}
+              variant="contained"
+              color="secondary"
+              startIcon={<VpnKeyIcon />}
+            >
+              Logout
+            </Button>
+          )}
         </Hidden>
         <Hidden lgUp>
-          <IconButton
-            color="inherit"
-            onClick={onMobileNavOpen}
-          >
+          <IconButton color="inherit" onClick={onMobileNavOpen}>
             <MenuIcon />
           </IconButton>
         </Hidden>

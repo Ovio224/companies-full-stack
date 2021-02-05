@@ -2,12 +2,7 @@ const db = require("../config/db.config.js");
 const User = db.users;
 
 const create = (req, res) => {
-  User.create(
-    {
-      attributes: { exclude: ["password", "createdAt", "updatedAt"] }
-    },
-      {...req.body}
-  )
+  User.create({ ...req.body })
     .then(user => {
       res.send(user);
     })
@@ -29,9 +24,7 @@ const findAll = (req, res) => {
 };
 
 const findById = (req, res) => {
-  User.findById(
-    req.params.userId
-  )
+  User.findById(req.query.userId)
     .then(user => {
       res.send(user);
     })
@@ -40,18 +33,25 @@ const findById = (req, res) => {
     });
 };
 
+const findByEmail = (req, res) => {
+  User.findOne({ where: { email: req.query.email } })
+    .then(user => {
+      if (!user) {
+        res.status(404).send({ status: 404, exceptionMessage: 'Not found' })
+        return
+      }
+      res.send(user);
+    })
+    .catch(err => {
+      res.status(500).send("Error -> " + err);
+    });
+};
+
 const updateById = (req, res) => {
-  const user = req.body;
   const id = req.params.userId;
-  User.update(
-    {
-      attributes: { exclude: ["password", "createdAt", "updatedAt"] }
-    },
-      {...req.body},
-    { where: { id } }
-  )
+  User.update({ ...req.body }, { where: { id } })
     .then(() => {
-      res.status(200).send(user);
+      res.status(200).send(User.findById(id));
     })
     .catch(err => {
       res.status(500).send("Error -> " + err);
@@ -72,6 +72,7 @@ const deleteById = (req, res) => {
 };
 
 module.exports = {
+  findByEmail,
   deleteById,
   updateById,
   create,
